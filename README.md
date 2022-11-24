@@ -14,3 +14,6 @@ ln -s build/btparser.js web/btparser.js
 ln -s build/btparser.wasm web/btparser.wasm
 python -m http.server
 ```
+
+### Demo
+https://openbody.org/main/btparser
