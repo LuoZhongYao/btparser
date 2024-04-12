@@ -4,14 +4,14 @@ Bluetooth HCI protocol analysis
 ### Build
 
 ```
-cmake -B build -GNinja -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake
+cmake -B build -GNinja -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ```
 
 ### Usage
 
 ```
-ln -s build/btparser.js web/btparser.js
-ln -s build/btparser.wasm web/btparser.wasm
+cp build/btmon.js web/btmon.js
+cp build/btmon.wasm web/btmon.wasm
 python -m http.server
 ```
 

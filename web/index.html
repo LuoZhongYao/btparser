@@ -1,93 +1,44 @@
 <html>
 <head>
 <title>Bluetooth HCI protocol analysis</title>
-
-<script type="text/javascript">
-var indent = 0;
-var usagePage;
-var collection;
-var stackPtr;
-var possible_errors;
-
-var Module = {
-	onRuntimeInitialized: function() {
-		_hci_init_parser(0);
-	},
-
-	print: function(str) {
-		document.getElementById("myoutput").value += str + "\n";
-	}
-}
-
-function get_bytes()
-{
-	var inVals = Array();
-	var inTxt = document.getElementById("myinput").value;
-	inTxt = inTxt.replace(/^radix:(.*)$/gmi, "");
-	inTxt = inTxt.replace(/(\/\*(.*?)\*\/)|(\/\/(.*?)$)|[g-w]|[yz]/gmi, ""); // strip C/C++ comments, non-hex chars
-	document.getElementById("myinput").value = inTxt;
-	var inSplit = inTxt.split(/(?![+-])\W/); // split by all non-alphanumeric characters
-	if(inSplit.length === 1 && inSplit[0].length > 2) {
-		// split every 2 chars
-		inSplit = inSplit[0].match(/.{1,2}/g);
-	}
-
-	// split every 2 chars
-	inSplit.forEach((e) => {
-		var x = parseInt(e, 16);
-		if (x >= 0 && x <= 0xFF) {
-			inVals.push(x);
-		}
-	})
-
-	return inVals;
-}
-
-function parse_4wire()
-{
-	document.getElementById("myoutput").value = "";
-
-	// Create example data to test float_multiply_array
-	var data = get_bytes();
-
-	// Get data byte size, allocate memory on Emscripten heap, and get pointer
-	var buffer = Module._malloc(data.length);
-
-	Module.HEAPU8.set(data, buffer)
-	// Call function and get result
-	_hci_4wire_parse(buffer, data.length, true);
-
-	// Free memory
-	Module._del(buffer);
-}
-
-function parse_3wire()
-{
-	document.getElementById("myoutput").value = "";
-
-	// Create example data to test float_multiply_array
-	var data = get_bytes();
-
-	// Get data byte size, allocate memory on Emscripten heap, and get pointer
-	var buffer = Module._malloc(data.length);
-
-	Module.HEAPU8.set(data, buffer)
-	// Call function and get result
-	_hci_3wire_parse(buffer, data.length, true);
-
-	// Free memory
-	Module._del(buffer);
-}
-</script>
-<script type="text/javascript" src="btparser.js"></script>
+<link rel="stylesheet" href="xterm.css" />
+<script type="text/javascript" src="xterm.js"></script>
 </head>
 <body>
 	<h2>Bluetooth HCI protocol analysis</h2>
+	<form id="monitor" name="monitor" style="display:flex">
+		<label for="fname">Pairty:</label>
+		<select name="parity" id="parity">
+      <option value="none">none</option>
+      <option value="odd">odd</option>
+      <option value="even" selected>even</option>
+    </select>			
+		<label for="fname">Baudrate:</label>
+	  <input type="number" id="baudRate" name="baudRate" value="2000000">
+		<label for="fname">DataBits:</label>
+		<select name="dataBits" id="dataBits">
+      <option value="8">8</option>
+      <option value="7">7</option>
+    </select>			
+		<label for="fname">StopBits:</label>
+		<select name="stopBits" id="stopBits">
+      <option value="1">1</option>
+      <option value="2">2</option>
+    </select>			
+		<label for="fname">Transport:</label>
+		<select name="transport" id="transport">
+      <option value="H5" selected>H5</option>
+      <option value="H4">H4</option>
+    </select>			
+		<input type="submit" value="capture">
+		<input type="button" id="stop" value="stop">
+	</form>
+	
 	<form id="myform" name="myform">
-		<fieldset style="min-height:30%">
+		<fieldset style="min-height:10%">
 			<legend>Input</legend>
 			hexadecimal values, seperated by commas or whitespace, "0x" or "$" prefix is optional, invalid numbers are treated as 0 or ignored, C style comments will be stripped out<br />
-			<textarea id="myinput" name="myinput" style="width:100%;min-height:100px;height:33%;font-family:monospace"></textarea>
+			<textarea id="myinput" name="myinput" style="width:100%;min-height:100px;height:10%;font-family:monospace"></textarea>
 		</fieldset>
 		<fieldset>
 			<legend>Parse as...</legend>
@@ -101,10 +52,15 @@ function parse_3wire()
 			<input type="button" value="I do not know, make a guess for me" onclick="best_guess()"/>
 			-->
 		</fieldset>
-		<fieldset style="min-height:30%">
+		<!--
+		<fieldset>
 			<legend>Output</legend>
 			<textarea id="myoutput" name="myoutput" style="width:100%;min-height:200px;height:33%;color:#000;font-family:monospace" readonly="readonly"></textarea>
 		</fieldset>
+		-->
 	</form>
+	<div id="terminal"></div>
 </body>
+<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="btmon.js"></script>
 </html>

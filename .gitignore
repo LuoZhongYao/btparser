@@ -24,6 +24,9 @@
 compile_flags.txt
 .vscode
 build/
+.cache/
 GPATH
 GRTAGS
 GTAGS
+compile_commands.json
+web/btmon.*
